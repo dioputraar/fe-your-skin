@@ -1,0 +1,188 @@
+export interface IVendor {
+  VendorID: number;
+  VendorCode: string;
+  VendorName: string;
+  VendorAddress: string;
+  VendorCity: string;
+  VendorPostalCode: string;
+  VendorPhone: string;
+  VendorFax: string;
+  VendorEmail: string;
+  VendorType: string;
+  CreatedAt: Date;
+  UpdatedAt: Date;
+}
+
+export interface IPO {
+  POHeaderID: number;
+  POItemID: number;
+  PONumber: string;
+  VendorType: string;
+  VendorCode: string;
+  VendorName: string;
+  CompanyCode: string;
+  Plant: string;
+  POCreator: string;
+  POCreatorName: string;
+  POItem: number;
+  MaterialNumber: string;
+  MaterialDescription: string;
+  Quantity: number;
+  QtyParkingOpen: number;
+  Currency: string;
+  Price: number;
+  DeliveryDateSAP: Date;
+  SequenceStatus: boolean | number;
+  POQuantity?: number;
+  NetOrderPrice?: number;
+  DeliveryDate?: Date;
+  ConfirmArrivalDate?: Date;
+  ConfirmPOStatus?: boolean;
+  TotalGR?: number;
+  QtyTicketOpen?: number;
+}
+
+export interface IPOHeader {
+  POHeaderID: number;
+  POType: string;
+  PONumber: string;
+  PODate: Date;
+  POCreator: string;
+  POCreatorName: string;
+  VendorCode: string;
+  VendorName: string;
+  PaymentTerms: string;
+  PurchasingGroup: string;
+  ReleaseIndicator: string;
+  TermPaymentDescription: string;
+  LastPOApprove: string;
+  ApproveName: string;
+  VendorAddress: string;
+  VendorCity: string;
+  VendorPostalCode: string;
+  VendorPhone: string | null;
+  VendorFax: string | null;
+  TaxCode: string;
+  CompanyCode: string;
+  CreatedAt: Date;
+  UpdatedAt: Date;
+}
+
+export interface IPOBody {
+  POItemID: number;
+  POHeaderID: number;
+  POItem: string;
+  DeletionIndicator: string | null;
+  ObjectValue: string | null;
+  POQuantity: number;
+  Currency: string;
+  MaterialDocumentYear: string;
+  MaterialDocument: string | null;
+  MaterialDocumentItem: string | null;
+  POCategory: string | null;
+  MovementType: string | null;
+  PostingDate: Date | null;
+  GRQuantity: number;
+  Amount: number;
+  Currency2: string | null;
+  DeliveryCompleted: string | null;
+  FinalInvoice: string | null;
+  AccountAssignmentCategory: string | null;
+  PlannedDeliveryTime: number;
+  PRNumber: string;
+  PRItem: string;
+  PRDate: Date;
+  EntryDate: Date | null;
+  EntryTime: Date;
+  InvoiceValue: number;
+  MaterialNumber: string;
+  Plant: string;
+  DocumentDate: Date | null;
+  GRIRClearingValue: number;
+  Inbound: string | null;
+  Item: string | null;
+  MaterialDescription: string;
+  DeliveryDate: Date;
+  OutstandingGRQuantity: number;
+  OutstandingPOQuantity: number;
+  POReleaseDate: Date;
+  NetOrderPrice: number;
+  VendorMaterialNumber: string | null;
+  RequisitionDate: Date;
+  ShortText: string;
+  BillOfLoading: string | null;
+  IRDebetCredit: string | null;
+  OrderUnit: string;
+  Plant2: string;
+  Reference: string | null;
+  ReferenceDocument: string | null;
+  ReferenceDocumentItem: string | null;
+  ShippingMethod: string;
+  StorageLocation: string;
+  isPOClosed: boolean;
+  UniqueID: string;
+  CreatedAt: Date;
+  UpdatedAt: Date;
+}
+
+export interface IPR {
+  PRListID: number;
+  PRNumber: string;
+  PRItem: number;
+  PRNumberPRItem: string;
+  PRType: string;
+  PRDescription: string;
+  PRDeletion: string;
+  PRCreateDate: Date;
+  PRReleaseIndicator: string;
+  PRReleaseDate: Date;
+  PartNumber: string;
+  PartNumberDescription: string;
+  PRQuantity: number;
+  PRUOM: string;
+  ProductionOrder: string;
+  POType: string;
+  POTypeDescription: string;
+  PODeletionIndicator: string;
+  POCreateDate: Date;
+  POReleaseIndicator: string;
+  POReleaseDate: Date;
+  PONumber: string;
+  POItem: number;
+  POQuantity: number;
+  POUOM: string;
+  PlanNumberFOperation: string;
+  Counter: number;
+  ReservationNumber: string;
+  ReservationItem: number;
+  OperationItem: number;
+  Plant: string;
+  StorageLocation: string;
+  ReleaseCode: string;
+  ProcNRP: string;
+  ProcName: string;
+  ProcCreatedAt: Date;
+  ProcUpdatedAt: Date;
+  ReleaseBy: number;
+  ReleaseDate: Date;
+  LastModifiedBy: number;
+  PRDeliveryDate: Date;
+  PurchasingGroup: string;
+  ReleaseStrategy: number;
+  ReleaseStrategyDescription: string;
+  PRReleaseState: null;
+  MAP: number;
+  CreatedAt: Date;
+  UpdatedAt: Date;
+}
+
+export interface ISLA {
+  SLAID: number;
+  SLAName: string;
+  SLADescription: string;
+  SLAValue: number;
+  SLAGroup: string;
+  SLAStatus: boolean;
+  CreatedAt: Date;
+  UpdatedAt: Date;
+}

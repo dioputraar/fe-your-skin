@@ -9,12 +9,27 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@dnd-kit/react": "^0.5.1",
+    "@heroui-pro/react": "^1.0.0-beta.10",
+    "@heroui/react": "^3.2.6",
+    "@hookform/resolvers": "^5.9.1",
+    "@tanstack/react-table": "^8.21.3",
+    "axios": "^1.20.0",
+    "clsx": "^2.1.1",
+    "framer-motion": "^14.0.0",
+    "js-cookie": "^3.0.8",
+    "lucide-react": "^1.52.0",
     "next": "16.3.8",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "react-hook-form": "^7.89.0",
+    "react-select": "^5.10.2",
+    "tailwind-merge": "^3.7.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -22,5 +37,8 @@
     "eslint-config-next": "16.3.8",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "@heroui-pro/react@1.0.0-beta.10": true
   }
 }

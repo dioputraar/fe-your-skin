@@ -13,8 +13,7 @@ import {
   Select,
   TextField,
 } from "@heroui/react";
-import axios from "axios";
-import Cookies from "js-cookie";
+import api from "@/lib/api";
 import {
   Baby,
   Check,
@@ -127,12 +126,7 @@ export default function FormModal({
   const onSubmit = async (values: IngredientFormValues) => {
     setIsLoading(true);
     try {
-      const token = Cookies.get("token");
-      const headers = {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      };
-
-      const payload = {
+      const body = {
         name: values.name,
         primary_function: values.primary_function,
         comedogenic_rating: Number(values.comedogenic_rating),
@@ -143,9 +137,9 @@ export default function FormModal({
       };
 
       if (mode === "insert") {
-        await axios.post(url, payload, { headers });
+        await api.post(url, body);
       } else {
-        await axios.put(url, payload, { headers });
+        await api.put(url, body);
       }
 
       handleClose();
@@ -258,20 +252,14 @@ export default function FormModal({
                   name="target_conditions"
                   control={control}
                   render={({ field }) => (
-                    <Select<any, "multiple">
+                    <Select
+                      selectionMode="multiple"
                       aria-label="Target Conditions"
                       className="w-full"
-                      selectionMode="multiple"
+                      isInvalid={Boolean(errors.target_conditions)}
                       placeholder="Pilih Target Conditions"
-                      value={field.value || []}
                       onChange={(val) => {
-                        field.onChange(
-                          Array.isArray(val)
-                            ? val.map(String)
-                            : val
-                            ? [String(val)]
-                            : []
-                        );
+                        field.onChange(val)
                       }}
                     >
                       <Select.Trigger className="rounded-xl border border-[#d9e4e9] bg-white px-3 min-h-10 flex items-center">
@@ -316,14 +304,12 @@ export default function FormModal({
                           ))}
                         </ListBox>
                       </Select.Popover>
+                      <FieldError>
+                        {errors.target_conditions?.message as string | undefined}
+                      </FieldError>
                     </Select>
                   )}
                 />
-                {errors.target_conditions && (
-                  <FieldError>
-                    {errors.target_conditions?.message as string | undefined}
-                  </FieldError>
-                )}
               </div>
 
               {/* Toggle Pills: Booleans */}

@@ -1,10 +1,14 @@
-"use client"
+
+"use client";
+
+import RouteGuard from "@/components/auth/RouteGuard";
 
 import Datatable from "@/components/ui/Datatable"
 import Sidebar from "@/components/layout/Sidebar"
 import ModalForm from "@/app/product/form"
 import DetailModal from "@/app/product/detail"
 import BadgePill from "@/components/ui/BadgePill"
+import Can from "@/components/auth/Can"
 import { Button, Chip } from "@heroui/react"
 import { ColumnDef } from "@tanstack/react-table"
 import { useState } from "react"
@@ -101,27 +105,31 @@ export default function BrandPage() {
                             <Icon.Eye size={15} />
                             Detail
                         </Button>
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onPress={() => {
-                                setSelectedItem(data);
-                                setMode("update");
-                                setOpen(true);
-                            }}
-                            className="gap-1.5 rounded-xl font-medium"
-                        >
-                            <Icon.Pencil size={15} />
-                            Edit
-                        </Button>
-                        <Button
-                            variant="danger-soft"
-                            size="sm"
-                            className="gap-1.5 rounded-xl font-medium"
-                        >
-                            <Icon.Power size={15} />
-                            Deactive
-                        </Button>
+                        <Can do={["EDIT_PRODUCT", "MANAGE_PRODUCT"]}>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onPress={() => {
+                                    setSelectedItem(data);
+                                    setMode("update");
+                                    setOpen(true);
+                                }}
+                                className="gap-1.5 rounded-xl font-medium"
+                            >
+                                <Icon.Pencil size={15} />
+                                Edit
+                            </Button>
+                        </Can>
+                        <Can do={["DELETE_PRODUCT", "MANAGE_PRODUCT"]}>
+                            <Button
+                                variant="danger-soft"
+                                size="sm"
+                                className="gap-1.5 rounded-xl font-medium"
+                            >
+                                <Icon.Power size={15} />
+                                Deactive
+                            </Button>
+                        </Can>
                     </div >
                 );
             },
@@ -132,7 +140,8 @@ export default function BrandPage() {
         setTableData(data);
     };
     return (
-        <div className="flex min-h-screen bg-[#EFF4F7]">
+        <RouteGuard requiredPermission={["VIEW_PRODUCT", "MANAGE_PRODUCT"]}>
+            <div className="flex min-h-screen bg-[#EFF4F7]">
             <Sidebar />
 
             {/* --- Main content --- */}
@@ -144,10 +153,12 @@ export default function BrandPage() {
                         </span>
                         <h1 className="mt-1 text-5xl font-extrabold text-[#17324A]">{MENU}</h1>
                     </div>
-                    <Button onPress={() => { setSelectedItem(undefined); setMode("insert"); setOpen(true); }} className="shrink-0 gap-2 rounded-full bg-[#4A9CC7] px-6 py-3 font-bold text-white hover:bg-[#3f8fb8]">
-                        <Icon.Plus size={18} />
-                        Add {MENU}
-                    </Button>
+                    <Can do={["CREATE_PRODUCT", "MANAGE_PRODUCT"]}>
+                        <Button onPress={() => { setSelectedItem(undefined); setMode("insert"); setOpen(true); }} className="shrink-0 gap-2 rounded-full bg-[#4A9CC7] px-6 py-3 font-bold text-white hover:bg-[#3f8fb8]">
+                            <Icon.Plus size={18} />
+                            Add {MENU}
+                        </Button>
+                    </Can>
                 </div>
 
                 {/* --- DataTable --- */}
@@ -176,6 +187,7 @@ export default function BrandPage() {
                 />
             </main>
         </div>
+        </RouteGuard>
     )
 }
 

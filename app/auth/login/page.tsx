@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import axios from "axios";
-import Cookies from "js-cookie";
+import { useAuth } from "@/context/AuthContext";
 import { Button, Card, FieldError, Input, Label, TextField } from "@heroui/react";
 import { AlertCircle, CheckCircle2, Droplet, Heart, Info, Lock } from "lucide-react";
 
@@ -18,10 +18,14 @@ const schema = z.object({
 
 type LoginValues = z.infer<typeof schema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { login } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const redirectTarget = searchParams?.get("redirect") || "/brand";
 
   const {
     control,
@@ -51,21 +55,22 @@ export default function LoginPage() {
       );
 
       if (response.status === 200 || response.status === 201) {
-        // Simpan token ke cookie agar otomatis terbaca oleh Datatable & API call lainnya
         const token =
           response.data?.token ||
           response.data?.data?.token ||
           response.data?.data?.access_token ||
           response.data?.access_token;
 
+        const userData = response.data?.user || response.data?.data?.user;
+
         if (token) {
-          Cookies.set("token", token, { expires: 7 }); // Berlaku 7 hari
+          login(token, userData);
         }
 
         setSuccessMessage("Login successful! Redirecting...");
         setTimeout(() => {
-          router.push("/brand");
-        }, 1200);
+          router.push(redirectTarget);
+        }, 1000);
       }
     } catch (error: any) {
       console.error("Login error:", error);
@@ -210,5 +215,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#f8fbfd] via-[#f3f7fa] to-[#fbf5f7]" />
+      }
+    >
+      <LoginForm />
+    </React.Suspense>
   );
 }

@@ -10,7 +10,7 @@ import {
   Modal,
   TextField,
 } from "@heroui/react";
-import axios from "axios";
+import api from "@/lib/api";
 import { Check, ShieldCheck, Sparkles, UploadCloud, X, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -18,7 +18,12 @@ import { z } from "zod";
 
 const schema = z.object({
   name: z.string().trim().min(3, "Brand name must be filled"),
-  image: z.instanceof(FileList).optional(),
+  image: z
+    .custom<FileList | undefined>((val) => {
+      if (!val) return true;
+      return typeof FileList !== "undefined" && val instanceof FileList;
+    })
+    .optional(),
   parent_company: z.string().trim(),
   is_halal_certified: z.boolean(),
   is_active: z.boolean(),
@@ -108,9 +113,9 @@ export default function BrandFormModal({
       if (values.image?.[0]) body.append("image", values.image[0]);
 
       if (mode === "insert") {
-        await axios.post(url, body);
+        await api.post(url, body);
       } else {
-        await axios.put(url, body);
+        await api.put(url, body);
       }
 
       handleClose();

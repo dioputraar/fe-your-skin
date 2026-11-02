@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import axios from "axios";
-import Cookies from "js-cookie";
+import api from "@/lib/api";
 import { Button } from "@heroui/react";
 import {
   Search,
@@ -63,13 +62,10 @@ export default function CatalogPage() {
   // 2. Fetch Master Categories & Brands for Sidebar
   useEffect(() => {
     const fetchMetadata = async () => {
-      const token = Cookies.get("token");
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
       try {
         const [catRes, brandRes] = await Promise.allSettled([
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/category`, { headers }),
-          axios.get(`${process.env.NEXT_PUBLIC_API_URL}/brand`, { headers }),
+          api.get("/category"),
+          api.get("/brand"),
         ]);
 
         if (catRes.status === "fulfilled") {
@@ -99,9 +95,6 @@ export default function CatalogPage() {
       }
 
       try {
-        const token = Cookies.get("token");
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
         // Kirim filter parameter jika ada
         const params: Record<string, any> = {
           page: targetPage,
@@ -116,10 +109,7 @@ export default function CatalogPage() {
           params.brand_id = selectedBrands[0];
         }
 
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/product/paging`,
-          { headers, params }
-        );
+        const res = await api.get("/product/paging", { params });
 
         const responseData = res.data?.data || res.data || {};
         let items: IProduct[] = [];

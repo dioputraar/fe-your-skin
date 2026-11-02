@@ -14,8 +14,7 @@ import {
   Select,
   ListBox
 } from "@heroui/react";
-import axios from "axios";
-import Cookies from "js-cookie";
+import api from "@/lib/api";
 import { Check, ShieldCheck, Sparkles, X, Zap, Package, UploadCloud, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -95,10 +94,7 @@ export default function FormModal({
 
     const fetchBrands = async () => {
       try {
-        const token = Cookies.get("token");
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/brand`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await api.get("/brand");
         const items = res.data ? res.data.data : [];
         setBrands(items);
       } catch (error) {
@@ -108,10 +104,7 @@ export default function FormModal({
 
     const fetchCategories = async () => {
       try {
-        const token = Cookies.get("token");
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/category`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await api.get("/category");
         const items = res.data ? res.data.data : [];
         setcategories(items);
       } catch (error) {
@@ -121,10 +114,7 @@ export default function FormModal({
 
     const fetchIngredients = async () => {
       try {
-        const token = Cookies.get("token");
-        const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/ingredient`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await api.get("/ingredient");
         const items = res.data ? res.data.data : [];
         setIngredients(items);
       } catch (error) {
@@ -370,11 +360,6 @@ export default function FormModal({
   const onSubmit = async (values: ProductFormValues) => {
     setIsLoading(true);
     try {
-      const token = Cookies.get("token");
-      const headers = {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      };
-
       const body = new FormData();
       body.append("product_name", values.product_name);
       body.append("brand_id", values.brand_id);
@@ -411,9 +396,9 @@ export default function FormModal({
       body.append("images_metadata", JSON.stringify(imagesMetadata));
 
       if (mode === "insert") {
-        await axios.post(url, body, { headers });
+        await api.post(url, body);
       } else {
-        await axios.put(url, body, { headers });
+        await api.put(url, body);
       }
 
       handleClose();

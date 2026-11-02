@@ -1,7 +1,14 @@
 "use client";
 
-import { HeroUIProvider } from "@heroui/react";
+import React from "react";
+import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@heroui/react";
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  return <HeroUIProvider>{children}</HeroUIProvider>;
+  return (
+    <AuthProvider>
+      <ToastProvider />
+      {children}
+    </AuthProvider>
+  );
 }

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Button, Chip, buttonVariants } from "@heroui/react";
-import { Menu, X, Sprout, ArrowRight } from "lucide-react";
+import { Menu, X, Sprout, ArrowRight, LogOut, User } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export function Brand({ size = 19 }: { size?: number }) {
   return (
@@ -20,6 +21,7 @@ export function Brand({ size = 19 }: { size?: number }) {
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
 
   return (
     <header className="sticky top-0 z-40 h-16 border-b border-[#e6eff2] bg-[#f8fcfdeb] backdrop-blur-md md:h-[74px]">
@@ -43,12 +45,33 @@ export default function Navbar() {
               NEW
             </Chip>
           </Link>
-          <Link
-            href="/product"
-            className={buttonVariants({ variant: "outline", size: "sm" })}
-          >
-            Admin Space <ArrowRight size={14} />
-          </Link>
+
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <Link
+                href="/brand"
+                className={buttonVariants({ variant: "outline", size: "sm" })}
+              >
+                Admin Space <ArrowRight size={14} />
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                onPress={logout}
+                className="gap-1.5 text-xs text-rose-600 hover:bg-rose-50 font-semibold"
+              >
+                <LogOut size={14} />
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Link
+              href="/auth/login"
+              className={buttonVariants({ variant: "outline", size: "sm" })}
+            >
+              Sign In <ArrowRight size={14} />
+            </Link>
+          )}
         </nav>
 
         {/* Mobile Hamburger Button */}
@@ -84,17 +107,38 @@ export default function Navbar() {
                 NEW
               </Chip>
             </Link>
-            <Link
-              href="/product"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`${buttonVariants({ variant: "outline", size: "sm" })} justify-center`}
-            >
-              Admin Space <ArrowRight size={14} />
-            </Link>
+
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/brand"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`${buttonVariants({ variant: "outline", size: "sm" })} justify-center`}
+                >
+                  Admin Space <ArrowRight size={14} />
+                </Link>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    logout();
+                  }}
+                  className="flex items-center gap-2 py-1 text-sm font-semibold text-rose-600"
+                >
+                  <LogOut size={16} /> Sign Out ({user?.email || "User"})
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/auth/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`${buttonVariants({ variant: "outline", size: "sm" })} justify-center`}
+              >
+                Sign In <ArrowRight size={14} />
+              </Link>
+            )}
           </nav>
         </div>
       )}
     </header>
   );
 }
-

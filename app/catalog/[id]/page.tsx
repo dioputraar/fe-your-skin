@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import axios from "axios";
-import Cookies from "js-cookie";
+import api from "@/lib/api";
 import { Button, Chip } from "@heroui/react";
 import {
   ArrowLeft,
@@ -44,13 +43,7 @@ export default function ProductDetailPage() {
       setSelectedImageIndex(0);
 
       try {
-        const token = Cookies.get("token");
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/product/${productId}`,
-          {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
-          }
-        );
+        const res = await api.get(`/product/${productId}`);
         const data = res.data?.data || res.data;
         setProduct(data);
       } catch (err: any) {

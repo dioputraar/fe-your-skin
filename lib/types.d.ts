@@ -71,3 +71,12 @@ interface IProduct {
     images?: IProductImage[];
 }
 
+interface IUser {
+    id: string;
+    email: string;
+    full_name?: string;
+    role?: string;
+    permissions?: string[];
+    created_at?: string | Date;
+}
+

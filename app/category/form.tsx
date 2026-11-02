@@ -10,7 +10,7 @@ import {
   Modal,
   TextField,
 } from "@heroui/react";
-import axios from "axios";
+import api from "@/lib/api";
 import { Check, Sparkles, UploadCloud, X, Zap } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -18,7 +18,12 @@ import { z } from "zod";
 
 const schema = z.object({
   name: z.string().trim().min(2, "Nama kategori minimal 2 karakter").max(100, "Maksimal 100 karakter"),
-  icon: z.instanceof(FileList).optional(),
+  icon: z
+    .custom<FileList | undefined>((val) => {
+      if (!val) return true;
+      return typeof FileList !== "undefined" && val instanceof FileList;
+    })
+    .optional(),
   is_active: z.boolean(),
 });
 
@@ -94,9 +99,9 @@ export default function CategoryFormModal({
       }
 
       if (mode === "insert") {
-        await axios.post(url, body);
+        await api.post(url, body);
       } else {
-        await axios.put(url, body);
+        await api.put(url, body);
       }
 
       handleClose();

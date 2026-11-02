@@ -280,7 +280,7 @@ export const DataTable = ({
                 <Dropdown.Menu
                   selectedKeys={visibleColumns}
                   selectionMode="multiple"
-                  onSelectionChange={ }
+                  onSelectionChange={() => {}}
                 >
                   {/* <Header>Select Visible Column</Header> */}
                   {table.getAllLeafColumns().map((column) => (

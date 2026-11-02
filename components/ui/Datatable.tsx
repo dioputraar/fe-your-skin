@@ -6,9 +6,8 @@ import {
   useReactTable,
   ColumnDef,
 } from "@tanstack/react-table";
-import axios from "axios";
+import api from "@/lib/api";
 import { useEffect, useState } from "react";
-import Cookies from "js-cookie";
 import * as Icon from "lucide-react";
 import { Button } from "@heroui/react";
 import {
@@ -59,10 +58,8 @@ export const DataTable = ({
     const getData = async () => {
       setIsLoading(true);
       try {
-        const token = Cookies.get("token");
-        const res = await axios.get(url, {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { page, limit, search, sort, order }, // Menambahkan sort & order
+        const res = await api.get(url, {
+          params: { page, limit, search, sort, order },
         });
 
         console.log(res.data);

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import axios from "axios";
+import api from "@/lib/api";
 import { Button, Card, FieldError, Input, Label, TextField } from "@heroui/react";
 import { AlertCircle, CheckCircle2, Droplet, Heart, Info, UserPlus } from "lucide-react";
 
@@ -62,15 +62,7 @@ export default function RegisterPage() {
         gender: values.gender,
       };
 
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/register`,
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await api.post("/auth/register", payload);
 
       if (response.status === 200 || response.status === 201) {
         setSuccessMessage("Account created successfully! Redirecting to login...");

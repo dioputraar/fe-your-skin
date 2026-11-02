@@ -7,7 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import axios from "axios";
-import { useAuth } from "@/context/AuthContext";
+import Cookies from "js-cookie";
 import { Button, Card, FieldError, Input, Label, TextField } from "@heroui/react";
 import { AlertCircle, CheckCircle2, Droplet, Heart, Info, Lock } from "lucide-react";
 
@@ -21,7 +21,6 @@ type LoginValues = z.infer<typeof schema>;
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useAuth();
   const [serverError, setServerError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -61,10 +60,8 @@ function LoginForm() {
           response.data?.data?.access_token ||
           response.data?.access_token;
 
-        const userData = response.data?.user || response.data?.data?.user;
-
         if (token) {
-          login(token, userData);
+          Cookies.set("token", token, { expires: 7 });
         }
 
         setSuccessMessage("Login successful! Redirecting...");

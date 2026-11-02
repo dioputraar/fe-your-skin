@@ -1,40 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 import * as Icon from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
 
 const NAV_ITEMS = [
   {
     label: "Product",
     href: "/product",
     icon: Icon.Package,
-    permission: ["VIEW_PRODUCT", "MANAGE_PRODUCT"],
   },
   {
     label: "Ingredient",
     href: "/ingredient",
     icon: Icon.FlaskConical,
-    permission: ["VIEW_INGREDIENT", "MANAGE_INGREDIENT"],
   },
   {
     label: "Brand",
     href: "/brand",
     icon: Icon.Sparkles,
-    permission: ["VIEW_BRAND", "MANAGE_BRAND"],
   },
   {
     label: "Category",
     href: "/category",
     icon: Icon.Layers,
-    permission: ["VIEW_CATEGORY", "MANAGE_CATEGORY"],
   },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user, logout, hasPermission } = useAuth();
+  const router = useRouter();
+
+  const logout = () => {
+    Cookies.remove("token");
+    router.push("/auth/login");
+  };
 
   return (
     <div>
@@ -50,30 +51,9 @@ export default function Sidebar() {
           </span>
         </div>
 
-        {/* User Profile Card */}
-        {user && (
-          <div className="mb-6 rounded-2xl bg-[#f5f9fb] p-3.5 border border-[#e1edf2]">
-            <div className="flex items-center gap-3">
-              <div className="grid h-9 w-9 place-items-center rounded-xl bg-skin-blue text-white font-bold text-xs uppercase shadow-xs">
-                {user.full_name?.charAt(0) || user.email?.charAt(0) || "U"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="truncate text-xs font-bold text-[#17324A]">
-                  {user.full_name || user.email.split("@")[0]}
-                </p>
-                <span className="inline-block rounded-full bg-skin-sky px-2 py-0.5 text-[10px] font-semibold text-skin-blue">
-                  {user.role || "ADMIN"}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Navigation Items (Dinamis sesuai Permission User) */}
+        {/* Navigation Items */}
         <nav className="flex flex-col gap-1.5 flex-1">
-          {NAV_ITEMS.filter(
-            (item) => !item.permission || hasPermission(item.permission)
-          ).map((item) => {
+          {NAV_ITEMS.map((item) => {
             const isActive = item.href === pathname;
             const ItemIcon = item.icon;
             return (

@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 import { Button, Chip, buttonVariants } from "@heroui/react";
-import { Menu, X, Sprout, ArrowRight, LogOut, User } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
+import { Menu, X, Sprout, ArrowRight, LogOut } from "lucide-react";
 
 export function Brand({ size = 19 }: { size?: number }) {
   return (
@@ -20,8 +21,19 @@ export function Brand({ size = 19 }: { size?: number }) {
 }
 
 export default function Navbar() {
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, isAuthenticated, logout } = useAuth();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    setIsAuthenticated(Boolean(Cookies.get("token")));
+  }, []);
+
+  const logout = () => {
+    Cookies.remove("token");
+    setIsAuthenticated(false);
+    router.push("/auth/login");
+  };
 
   return (
     <header className="sticky top-0 z-40 h-16 border-b border-[#e6eff2] bg-[#f8fcfdeb] backdrop-blur-md md:h-[74px]">
@@ -124,7 +136,7 @@ export default function Navbar() {
                   }}
                   className="flex items-center gap-2 py-1 text-sm font-semibold text-rose-600"
                 >
-                  <LogOut size={16} /> Sign Out ({user?.email || "User"})
+                  <LogOut size={16} /> Sign Out
                 </button>
               </>
             ) : (

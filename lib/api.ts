@@ -20,17 +20,22 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Tangani 401 Unauthorized secara global
+// Response Interceptor: Tangani 401 Unauthorized pada rute terproteksi
+const PROTECTED_PREFIXES = ["/brand", "/product", "/category", "/ingredient"];
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 && typeof window !== "undefined") {
       Cookies.remove("token");
       const currentPath = window.location.pathname;
-      if (!currentPath.startsWith("/auth/")) {
+      const isProtected = PROTECTED_PREFIXES.some((prefix) =>
+        currentPath.startsWith(prefix)
+      );
+      if (isProtected) {
         window.location.href = `/auth/login?redirect=${encodeURIComponent(
           currentPath
-        )}&session_expired=true`;
+        )}`;
       }
     }
     return Promise.reject(error);

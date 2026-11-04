@@ -21,7 +21,7 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { DragDropProvider, DragEndEvent } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import { VOLUME_UNITS } from "@/lib/constants"
+import { PRODUCT_SCOPE, APPLICATION_FORMAT, VOLUME_UNITS } from "@/lib/constants"
 
 const schema = z.object({
   product_name: z.string().trim().min(3, "Product name must be at least 3 characters"),
@@ -87,6 +87,7 @@ export default function FormModal({
   const [ingredientPercentage, setIngredientPercentage] = useState<string>("");
   const [ingredientError, setIngredientError] = useState<string>("");
   const [productImages, setProductImages] = useState<IProductImage[]>([]);
+  const [targetConcerns, setTargetConcerns] = useState<string[]>([]);
   // const [isLoadingBrands, setIsLoadingBrands] = useState(false);
 
   useEffect(() => {
@@ -149,11 +150,16 @@ export default function FormModal({
       return;
     }
 
+    const selectedIng = ingredients.find(
+      (ing) => String(ing.id) === String(selectedIngredientId)
+    );
+
     const newProductIngredient: IProductIngredient = {
       ingredient_id: selectedIngredientId,
       concentration_percentage: percentageNum,
-      is_key_active: false,
+      is_key_active: percentageNum >= 1,
       order_in_formula: productIngredients.length + 1,
+      ingredient: selectedIng,
     };
 
     setProductIngredients((prev) => [...prev, newProductIngredient]);
@@ -267,7 +273,7 @@ export default function FormModal({
   // Isi field saat mode update (data dari baris yang dipilih)
   useEffect(() => {
     try {
-      if (!data) return;
+      if (!isOpen || !data) return;
       setValue("product_name", data.product_name || data.name || "");
       setValue("brand_id", data.brand_id || "");
       setValue("category_id", data.category_id || "");
@@ -292,13 +298,21 @@ export default function FormModal({
       setValue("stock_status", data.stock_status ?? true);
       setValue("is_active", data.is_active ?? true);
 
-      if (data.ingredients && Array.isArray(data.ingredients)) {
+      setTargetConcerns(
+        Array.isArray(data.target_concerns) ? data.target_concerns : []
+      );
+
+      const rawIngredients = data.product_ingredients || data.ingredients;
+      if (rawIngredients && Array.isArray(rawIngredients)) {
         setProductIngredients(
-          data.ingredients.map((item: any, idx: number) => ({
-            ingredient_id: String(item.ingredient_id || item.id || item),
+          rawIngredients.map((item: any, idx: number) => ({
+            ingredient_id: String(item.ingredient_id || item.ingredient?.id || item.id || item),
             concentration_percentage: Number(item.concentration_percentage ?? 0),
-            is_key_active: Boolean(item.is_key_active ?? false),
-            order_in_formula: item.order_in_formula ?? (idx + 1),
+            is_key_active: Boolean(
+              item.is_key_active ?? Number(item.concentration_percentage ?? 0) >= 1
+            ),
+            order_in_formula: item.order_in_formula ?? idx + 1,
+            ingredient: item.ingredient,
           }))
         );
       } else {
@@ -310,14 +324,7 @@ export default function FormModal({
           data.images.map((img: any, idx: number) => ({
             id: img.id ? String(img.id) : `existing_${idx + 1}`,
             product_id: img.product_id,
-            image_url:
-              typeof img === "string"
-                ? img.startsWith("http")
-                  ? img
-                  : `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${img}`
-                : img.image_url?.startsWith("http")
-                  ? img.image_url
-                  : `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${img.image_url || ""}`,
+            image_url: typeof img === "string" ? img : img.image_url || "",
             display_order: img.display_order ?? idx + 1,
             file: img.file,
           }))
@@ -328,11 +335,7 @@ export default function FormModal({
     } catch (error) {
       console.error(error);
     }
-  }, [data, setValue]);
-
-  useEffect(() => {
-    console.log(productImages);
-  }, [productImages])
+  }, [data, isOpen, setValue]);
 
   // Bersihkan form setiap modal ditutup
   useEffect(() => {
@@ -340,6 +343,7 @@ export default function FormModal({
       reset(EMPTY_VALUES);
       setProductIngredients([]);
       setProductImages([]);
+      setTargetConcerns([]);
       setSelectedIngredientId("");
       setIngredientPercentage("");
       setIngredientError("");
@@ -351,6 +355,7 @@ export default function FormModal({
     reset(EMPTY_VALUES);
     setProductIngredients([]);
     setProductImages([]);
+    setTargetConcerns([]);
     setSelectedIngredientId("");
     setIngredientPercentage("");
     setIngredientError("");
@@ -373,9 +378,16 @@ export default function FormModal({
       body.append("is_alcohol_free", String(values.is_alcohol_free));
       body.append("stock_status", String(values.stock_status));
       body.append("is_active", String(values.is_active));
+      body.append("target_concerns", JSON.stringify(targetConcerns));
 
-      // Append ingredients
-      body.append("ingredients", JSON.stringify(productIngredients));
+      // Append ingredients (kirim field yang dibutuhkan backend)
+      const ingredientsPayload = productIngredients.map((item, idx) => ({
+        ingredient_id: item.ingredient_id,
+        concentration_percentage: Number(item.concentration_percentage ?? 0),
+        is_key_active: Boolean(item.is_key_active),
+        order_in_formula: item.order_in_formula ?? idx + 1,
+      }));
+      body.append("ingredients", JSON.stringify(ingredientsPayload));
 
       // Append product images files
       productImages.forEach((img) => {
@@ -383,8 +395,6 @@ export default function FormModal({
           body.append("images", img.file);
         }
       });
-
-
 
       // Append metadata gambar & urutan
       const imagesMetadata = productImages.map((img) => ({
@@ -539,29 +549,83 @@ export default function FormModal({
 
               {/* Scope & Format */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <TextField isInvalid={!!errors.scope}>
-                  <Label>Scope</Label>
+                <div className="flex flex-col gap-2">
+                  <Label className="text-sm font-medium">Scope</Label>
                   <Controller
                     name="scope"
                     control={control}
                     render={({ field }) => (
-                      <Input {...field} className="rounded-xl" placeholder="e.g. FACE / BODY" />
+                      <Select
+                        aria-label="Scope"
+                        className="w-full"
+                        placeholder="Choose Scope"
+                        value={field.value || null}
+                        onChange={(val) => field.onChange(val ? String(val) : "")}
+                      >
+                        <Select.Trigger className="rounded-xl border border-[#d9e4e9] bg-white px-3 flex items-center">
+                          <Select.Value className="flex items-center gap-2" />
+                          <Select.Indicator />
+                        </Select.Trigger>
+                        <Select.Popover>
+                          <ListBox aria-label="Daftar Scope">
+                            {PRODUCT_SCOPE.map((item) => (
+                              <ListBox.Item
+                                key={item.value}
+                                id={item.value}
+                                textValue={item.label}
+                              >
+                                {item.label}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            ))}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
                     )}
                   />
-                  <FieldError>{errors.scope?.message as string | undefined}</FieldError>
-                </TextField>
+                  {errors.scope && (
+                    <FieldError>{errors.scope?.message as string | undefined}</FieldError>
+                  )}
+                </div>
 
-                <TextField isInvalid={!!errors.format}>
-                  <Label>Format</Label>
+                <div className="flex flex-col gap-2">
+                  <Label className="text-sm font-medium">Format</Label>
                   <Controller
                     name="format"
                     control={control}
                     render={({ field }) => (
-                      <Input {...field} className="rounded-xl" placeholder="e.g. GEL / CREAM / SERUM" />
+                      <Select
+                        aria-label="Format"
+                        className="w-full"
+                        placeholder="Choose Format"
+                        value={field.value || null}
+                        onChange={(val) => field.onChange(val ? String(val) : "")}
+                      >
+                        <Select.Trigger className="rounded-xl border border-[#d9e4e9] bg-white px-3 flex items-center">
+                          <Select.Value className="flex items-center gap-2" />
+                          <Select.Indicator />
+                        </Select.Trigger>
+                        <Select.Popover>
+                          <ListBox aria-label="Daftar Format">
+                            {APPLICATION_FORMAT.map((item) => (
+                              <ListBox.Item
+                                key={item.value}
+                                id={item.value}
+                                textValue={item.label}
+                              >
+                                {item.label}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            ))}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
                     )}
                   />
-                  <FieldError>{errors.format?.message as string | undefined}</FieldError>
-                </TextField>
+                  {errors.format && (
+                    <FieldError>{errors.format?.message as string | undefined}</FieldError>
+                  )}
+                </div>
               </div>
 
               {/* pH Level, Volume Amount, Volume Unit */}
@@ -575,10 +639,16 @@ export default function FormModal({
                       <Input
                         {...field}
                         type="number"
+                        min="0"
+                        max="14"
                         step="0.1"
                         className="rounded-xl"
                         placeholder="5.5"
-                        onChange={(e) => field.onChange(e.target.valueAsNumber || e.target.value)}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === "" ? "" : Number(e.target.value)
+                          )
+                        }
                       />
                     )}
                   />
@@ -594,10 +664,15 @@ export default function FormModal({
                       <Input
                         {...field}
                         type="number"
+                        min="0"
                         step="any"
                         className="rounded-xl"
                         placeholder="30"
-                        onChange={(e) => field.onChange(e.target.valueAsNumber || e.target.value)}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === "" ? "" : Number(e.target.value)
+                          )
+                        }
                       />
                     )}
                   />
@@ -772,7 +847,10 @@ export default function FormModal({
                       const ingDetail = ingredients.find(
                         (ing) => String(ing.id) === String(item.ingredient_id)
                       );
-                      const name = ingDetail?.name || `Ingredient #${item.ingredient_id}`;
+                      const name =
+                        ingDetail?.name ||
+                        item.ingredient?.name ||
+                        `Ingredient #${item.ingredient_id}`;
 
                       return (
                         <div
@@ -781,9 +859,14 @@ export default function FormModal({
                         >
                           <div className="flex items-center gap-2.5">
                             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-skin-sky text-skin-blue text-xs font-semibold">
-                              {index + 1}
+                              {item.order_in_formula ?? index + 1}
                             </span>
                             <span className="text-sm font-semibold text-[#17324A]">{name}</span>
+                            {item.is_key_active && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 font-bold">
+                                Key Active
+                              </span>
+                            )}
                           </div>
 
                           <div className="flex items-center gap-2">
@@ -908,6 +991,12 @@ function SortableItem({
 }) {
   const id = data.id ?? data.display_order;
   const { ref, isDragging } = useSortable({ id, index });
+  const previewUrl =
+    data.image_url?.startsWith("http") ||
+    data.image_url?.startsWith("blob:") ||
+    data.image_url?.startsWith("/")
+      ? data.image_url
+      : `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${data.image_url}`;
 
   return (
     <div
@@ -933,7 +1022,7 @@ function SortableItem({
 
       {/* Preview Gambar */}
       <img
-        src={data.image_url}
+        src={previewUrl}
         alt={`preview ${data.display_order}`}
         draggable={false}
         className="h-full w-full object-contain pointer-events-none"

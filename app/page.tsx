@@ -312,11 +312,22 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-[#e6eff2] bg-white py-6">
-        <div className={`${wrap} flex flex-wrap items-center justify-between gap-3 text-sm text-skin-muted`}>
-          <Brand size={17} />
-          <span>Finding what works takes time. Be gentle with yourself.</span>
-          <span>© YourSkin. All rights reserved.</span>
+      <footer className="border-t border-[#e6eff2] bg-white py-8">
+        <div className={`${wrap} flex flex-col gap-5 text-sm text-skin-muted`}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <Brand size={17} />
+            <span>Finding what works takes time. Be gentle with yourself.</span>
+            <span>© {new Date().getFullYear()} YourSkin. All rights reserved.</span>
+          </div>
+
+          <div className="border-t border-[#eef4f6] pt-4 text-center text-xs leading-relaxed text-skin-muted/80">
+            <strong className="font-semibold text-skin-ink">Disclaimer:</strong>{" "}
+            Website ini merupakan proyek tiruan (dummy project) yang dibuat khusus
+            untuk keperluan portofolio dan demonstrasi teknis non-komersial.
+            Website ini tidak berafiliasi, disponsori, atau terafiliasi resmi
+            dengan PT Paragon Technology and Innovation. Seluruh hak merek dan
+            materi dagang tetap dimiliki oleh ParagonCorp.
+          </div>
         </div>
       </footer>
     </>

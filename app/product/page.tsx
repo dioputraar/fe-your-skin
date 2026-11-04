@@ -1,4 +1,3 @@
-
 "use client";
 
 import Datatable from "@/components/ui/Datatable"
@@ -35,8 +34,14 @@ export default function BrandPage() {
             enableSorting: false,
             cell: ({ row }) => {
                 const images = row.original.images;
+                const rawUrl = images && images.length > 0 ? images[0]?.image_url : null;
+                const src = rawUrl
+                    ? rawUrl.startsWith("http")
+                        ? rawUrl
+                        : `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${rawUrl.replace(/^\//, "")}`
+                    : "/product.png";
                 return (
-                    <img className="h-32 w-32" src={images ? `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${images[0].image_url}` : "public/file.svg"} alt="Gambar" />
+                    <img className="h-32 w-32 object-cover rounded-xl" src={src} alt="Gambar" />
                 );
             }
         },
@@ -87,7 +92,6 @@ export default function BrandPage() {
             header: "Action",
             cell: ({ row }) => {
                 const data = row.original;
-                console.log(data);
                 return (
                     <div className="flex items-center justify-center gap-1.5">
                         <Button
@@ -114,14 +118,6 @@ export default function BrandPage() {
                         >
                             <Icon.Pencil size={15} />
                             Edit
-                        </Button>
-                        <Button
-                            variant="danger-soft"
-                            size="sm"
-                            className="gap-1.5 rounded-xl font-medium"
-                        >
-                            <Icon.Power size={15} />
-                            Deactive
                         </Button>
                     </div >
                 );
@@ -179,4 +175,3 @@ export default function BrandPage() {
         </div>
     )
 }
-

@@ -100,14 +100,6 @@ export default function IngredientPage() {
                             <Icon.Pencil size={15} />
                             Edit
                         </Button>
-                        <Button
-                            variant="danger-soft"
-                            size="sm"
-                            className="gap-1.5 rounded-xl font-medium"
-                        >
-                            <Icon.Power size={15} />
-                            Deactive
-                        </Button>
                     </div>
                 );
             },

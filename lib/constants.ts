@@ -11,6 +11,7 @@ export enum ProductScope {
   FACE = "FACE",
   BODY = "BODY",
   HAIR = "HAIR",
+  HAIR_SCALP = "HAIR_SCALP",
   LIPS = "LIPS",
   EYES = "EYES",
 }
@@ -19,6 +20,7 @@ export const PRODUCT_SCOPE = [
   { value: ProductScope.FACE, label: "Face" },
   { value: ProductScope.BODY, label: "Body" },
   { value: ProductScope.HAIR, label: "Hair" },
+  { value: ProductScope.HAIR_SCALP, label: "Hair & Scalp" },
   { value: ProductScope.LIPS, label: "Lips" },
   { value: ProductScope.EYES, label: "Eyes" },
 ] as const;
@@ -37,6 +39,11 @@ export enum ApplicationFormat {
   STICK = "STICK",
   OIL = "OIL",
   BALM = "BALM",
+  TONER = "TONER",
+  SUNSCREEN = "SUNSCREEN",
+  SHAMPOO = "SHAMPOO",
+  FACIAL_WASH = "FACIAL_WASH",
+  MOISTURIZER = "MOISTURIZER",
 }
 
 export const APPLICATION_FORMAT = [
@@ -50,6 +57,11 @@ export const APPLICATION_FORMAT = [
   { value: ApplicationFormat.STICK, label: "Stick" },
   { value: ApplicationFormat.OIL, label: "Oil" },
   { value: ApplicationFormat.BALM, label: "Balm" },
+  { value: ApplicationFormat.TONER, label: "Toner" },
+  { value: ApplicationFormat.SUNSCREEN, label: "Sunscreen" },
+  { value: ApplicationFormat.SHAMPOO, label: "Shampoo" },
+  { value: ApplicationFormat.FACIAL_WASH, label: "Facial Wash" },
+  { value: ApplicationFormat.MOISTURIZER, label: "Moisturizer" },
 ] as const;
 
 // ==========================================

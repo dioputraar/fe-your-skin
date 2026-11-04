@@ -24,7 +24,7 @@ interface IProductImage {
     image_url: string;
     display_order: number;
     created_at?: string | Date;
-    file: File;
+    file?: File;
 }
 
 interface IProductIngredient {
@@ -35,6 +35,7 @@ interface IProductIngredient {
     is_key_active: boolean;
     order_in_formula?: number;
     created_at?: string | Date;
+    ingredient?: IIngredient;
 }
 
 interface IIngredient {
@@ -69,6 +70,8 @@ interface IProduct {
     brand?: IBrand;
     category?: ICategory;
     images?: IProductImage[];
+    product_ingredients?: IProductIngredient[];
+    ingredients?: IProductIngredient[];
 }
 
 interface IUser {

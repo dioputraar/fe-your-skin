@@ -69,9 +69,9 @@ export default function DetailModal({
 
   // Helper resolusi URL gambar
   const getImageUrl = (img: any): string => {
-    if (!img) return "/file.svg";
+    if (!img) return "/product.png";
     const path = typeof img === "string" ? img : img.image_url || img.url || "";
-    if (!path) return "/file.svg";
+    if (!path) return "/product.png";
     return path.startsWith("http") || path.startsWith("/")
       ? path
       : `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${path}`;

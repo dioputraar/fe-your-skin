@@ -8,12 +8,19 @@ const api = axios.create({
   },
 });
 
-// Request Interceptor: Otomatis sisipkan Bearer token
+// Request Interceptor: Otomatis sisipkan Bearer token & sesuaikan Content-Type untuk FormData
 api.interceptors.request.use(
   (config) => {
     const token = Cookies.get("token");
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (
+      typeof FormData !== "undefined" &&
+      config.data instanceof FormData &&
+      config.headers
+    ) {
+      delete config.headers["Content-Type"];
     }
     return config;
   },

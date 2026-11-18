@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+YourSkin_Architecture_Diagram.png
+YourSkin_Architecture_Diagram.svg
+YourSkin_Architecture_Illustrated.jpg
+YourSkin_Project_Presentation.pptx
+~$YourSkin_Project_Presentation.pptx

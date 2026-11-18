@@ -35,6 +35,8 @@ const schema = z.object({
   is_fragrance_free: z.boolean(),
   is_alcohol_free: z.boolean(),
   stock_status: z.boolean(),
+  price: z.number().min(1, "Price is must be greater than 0"),
+  quantity: z.number().min(1, "Quantity is must be greater than 0"),
   is_active: z.boolean(),
   ingredients: z.array(z.string()).optional()
   // product_images: z.array(Product)
@@ -54,6 +56,8 @@ const EMPTY_VALUES: ProductFormValues = {
   is_fragrance_free: false,
   is_alcohol_free: false,
   stock_status: true,
+  price: 0,
+  quantity: 0,
   is_active: true,
   ingredients: [],
 
@@ -296,6 +300,8 @@ export default function FormModal({
       );
       setValue("is_alcohol_free", data.is_alcohol_free ?? false);
       setValue("stock_status", data.stock_status ?? true);
+      setValue("price", data.price ?? 0);
+      setValue("quantity", data.quantity ?? 0);
       setValue("is_active", data.is_active ?? true);
 
       setTargetConcerns(
@@ -379,6 +385,8 @@ export default function FormModal({
       body.append("stock_status", String(values.stock_status));
       body.append("is_active", String(values.is_active));
       body.append("target_concerns", JSON.stringify(targetConcerns));
+      body.append("price", String(values.price))
+      body.append("quantity", String(values.quantity))
 
       // Append ingredients (kirim field yang dibutuhkan backend)
       const ingredientsPayload = productIngredients.map((item, idx) => ({
@@ -720,6 +728,57 @@ export default function FormModal({
 
               </div>
 
+              {/* Price and Quantiy  */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <TextField isInvalid={!!errors.price}>
+                  <Label>Price</Label>
+                  <Controller
+                    name="price"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0"
+                        step="any"
+                        className="rounded-xl"
+                        placeholder="30"
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === "" ? "" : Number(e.target.value)
+                          )
+                        }
+                      />
+                    )}
+                  />
+                  <FieldError>{errors.price?.message as string | undefined}</FieldError>
+                </TextField>
+
+                <TextField isInvalid={!!errors.quantity}>
+                  <Label>Quantity</Label>
+                  <Controller
+                    name="quantity"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        type="number"
+                        min="0"
+                        step="any"
+                        className="rounded-xl"
+                        placeholder="30"
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value === "" ? "" : Number(e.target.value)
+                          )
+                        }
+                      />
+                    )}
+                  />
+                  <FieldError>{errors.quantity?.message as string | undefined}</FieldError>
+                </TextField>
+              </div>
+
               {/* Toggle Pills: Booleans */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                 <Controller
@@ -993,8 +1052,8 @@ function SortableItem({
   const { ref, isDragging } = useSortable({ id, index });
   const previewUrl =
     data.image_url?.startsWith("http") ||
-    data.image_url?.startsWith("blob:") ||
-    data.image_url?.startsWith("/")
+      data.image_url?.startsWith("blob:") ||
+      data.image_url?.startsWith("/")
       ? data.image_url
       : `${process.env.NEXT_PUBLIC_CLOUDINARY_URL}/${data.image_url}`;
 

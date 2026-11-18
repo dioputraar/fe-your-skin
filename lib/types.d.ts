@@ -65,6 +65,8 @@ interface IProduct {
     stock_status?: boolean;
     created_at?: string | Date;
     is_active: boolean;
+    price?: number | null;
+    quantity?: number | null;
 
     // Relasi opsional dari API
     brand?: IBrand;

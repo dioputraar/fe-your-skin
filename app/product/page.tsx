@@ -8,6 +8,7 @@ import BadgePill from "@/components/ui/BadgePill"
 import { Button, Chip } from "@heroui/react"
 import { ColumnDef } from "@tanstack/react-table"
 import { useState } from "react"
+import { rupiah } from "@/lib/utils"
 import * as Icon from "lucide-react"
 
 const MENU = "Product";
@@ -74,6 +75,25 @@ export default function BrandPage() {
                     </Chip>
 
                 );
+            }
+        },
+        {
+            accessorKey: "price",
+            header: "Price",
+            cell: ({ row }) => {
+                const price = rupiah(row.original.price ?? 0);
+                return (
+                    <>
+                        {price}
+                    </>
+                )
+            }
+        },
+        {
+            accessorKey: "quantity",
+            header: "QTY",
+            cell: ({ row }) => {
+                return <span>{row.original.quantity}</span>
             }
         },
         {
